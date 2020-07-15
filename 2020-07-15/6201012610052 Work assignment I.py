@@ -1,4 +1,4 @@
-# 6201012610052 เป็นโค้ดสำหรับ Assignment I
+#6201012610052 เป็นโค้ดสำหรับ Assignment I
 
 import pygame
 import random, math
