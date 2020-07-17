@@ -1,5 +1,6 @@
 # 6201012610052 Assingment I
 # update feture 'No spawn in broder'
+# update feture 'Sort in list'
 import pygame
 import random, math
 
