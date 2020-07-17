@@ -1,4 +1,5 @@
 # 6201012610052 Assingment I
+# update feture 'No spawn in broder'
 import pygame
 import random, math
 
