@@ -1,3 +1,4 @@
+#6201012610052
 import threading
 import time
 import cmath
@@ -16,8 +17,8 @@ clock = pygame.time.Clock()
 surface = pygame.Surface( screen.get_size(), pygame.SRCALPHA )
 #---------------------------------------------------------------
 
-drawingX = 2
-drawingY = 2
+drawingX = 2 #number of picture x-aixs
+drawingY = 2 #number of picture y-aixs
 
 #---------------------------------------------------------------
 
