@@ -1,4 +1,4 @@
-#6201012610052
+#6201012610052 เป็นโค้ดสำหรับ ข้อ 6. # 22/07/2020
 import threading
 import time
 import cmath
