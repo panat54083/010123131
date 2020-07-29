@@ -6,11 +6,6 @@ import pygame.camera
 from pygame.locals import *
 import sys
 
-# For windows 10, install VideoCapture 
-# https://www.lfd.uci.edu/~gohlke/pythonlibs/#videocapture
-
-# Open Terminal in VSCode and run the following command
-# $  pip install VideoCapture 
 
 def open_camera( frame_size=(640,480),mode='RGB'):
     pygame.camera.init()
@@ -44,9 +39,6 @@ else:
     print('Cannot open camera')
     sys.exit(-1)
 
-# screen = pygame.display.set_mode((scr_w, scr_h))
-
-# surface = pygame.Surface( screen.get_size(), pygame.SRCALPHA )
 #-------------------------------------------------------------------------------------------
 listRectData = list()
 numRect = 0
@@ -101,12 +93,6 @@ while is_running:
             rect = (j*rw, i*rh, rw, rh)
             listRectData[numRect].rect = rect
 
-            # Draw  a black Rect
-            # pygame.draw.rect( surface, (0, 0, 0), rect)
-
-            # pygame.draw.rect( surface, (0,255,0,50), rect,1)
-            
-            # surface.blit( surface,rect, rect)
 
             numRect += 1
             x_pos += scr_w / M
@@ -126,9 +112,6 @@ while is_running:
                 if data.firstx <= mx <= data.secx and data.firsty <= my <= data.secy:
                     print("EIEI")               
                     listRemove.append(data)
-                    # pygame.draw.rect( surface, (255,255,255), data.rect)
-                    # surface.blit( img, data.rect, data.rect)
-                    # data.__dict__ = {}
 
     for own in listRectData:
         pygame.draw.rect( surface, (0,255,0), own.rect,1)
