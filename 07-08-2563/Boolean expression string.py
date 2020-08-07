@@ -1,5 +1,6 @@
 # 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1
 # ยังไม่สมบูณ์
+# 17.50 แก้ไขเล็กน้อย
 class boolExpStr():
     
     def __init__(self, equation):
@@ -49,10 +50,11 @@ class boolExpStr():
         equa = self.putInList(self.equa)
 
         print(equa)
+        alphabet = ['0', '1', 'I1', 'I2','I3']
         priority = {'+':1, '&':1, '!':1, '(':0}
         postfix = ''
         for ch in equa:
-            if ch.isidentifier():
+            if ch in alphabet :
                 postfix += ch
             elif ch in '!+&':
                 if self.isEmpty():
@@ -71,19 +73,36 @@ class boolExpStr():
 
         while not(self.isEmpty):
             postfix += self.pop()
+
         # แบ่งรูปแบบ postfix ให้แต่ละสมาชิกอยู่คนละ index 
         result = self.putInList(postfix)
+        print(result)
         for token in range(len(result)):
             if len(result[token]) == 4:
 
-                a = result[token][0:2]
+                a = result[token][:2]
                 b = result[token][2:]
                 del result[token]
 
                 result.insert(token, a)
-                result.insert(token+1, b) 
+                result.insert(token+1, b)
+
+            elif result[token] == '01' or result[token] == '10':
+
+                a = result[token][:1]
+                b = result[token][1:]
+                del result[token]
+                result.insert(token, a)
+                result.insert(token+1, b)
+                
         return result
         
 eq1 = boolExpStr("(I0&I1 + !(I1&I2))")
+eq2 = boolExpStr("!(1+0)")
+eq3 = boolExpStr("!(!(0+I0&1))")
+eq4 = boolExpStr("(I0+!I1+!(I2))&(!I0+I1+I2)") # มีวงเล็บโผล่มา
+eq5 = boolExpStr("!(I0&I1)+!(I1+I2)")
+eq6 = boolExpStr("(((I0&I1&!I2)+!I1)+I3)")
 
-print(eq1.convertPost())
+print(eq6.convertPost())
+
