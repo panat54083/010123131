@@ -1,4 +1,5 @@
-
+# 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1
+# ยังไม่สมบูณ์
 class boolExpStr():
     
     def __init__(self, equation):
