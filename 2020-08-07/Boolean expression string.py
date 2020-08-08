@@ -3,12 +3,15 @@
 # 17.50 07/08/2020 แก้ไขเล็กน้อย
 # 01.55 08/08/2020 แก้ไขการแปลงเป็น postfix
 # 16.56 08/08/2020 เพิ่ม expression tree และแก้ไข postfix
+# 1.56 09/08/2020 แก้ไขการแปลง postfix และ เพิ่มการวาด pygame ปัญหาที่พบเจอ(ยังแก้ไม่ได้) ตัวอักษรกระพริบ และ ขนาดการสร้างวงกลมให้เข้ากับรุปแบบสมการไม่ดีอย่างที่ควร
 
 
+import pygame
 class boolExpStr():
     
-    def __init__(self, equation):
+    def __init__(self, equation = None):
         self.equa = equation.replace(" ","")
+
 #checkOperator        
     def isOperator(self, c):
         if c == '+' or c == '&' or c == '!':
@@ -52,7 +55,7 @@ class boolExpStr():
 
         # print(equa)
         alphabet = ['0', '1', 'I1', 'I2','I3','I0']
-        priority = {'+':1, '&':1, '!':1, '(':0}
+        priority = {'+':1, '&':1, '!':2, '(':0}
         postfix = []
         stack = []
 
@@ -73,45 +76,24 @@ class boolExpStr():
         while len(stack) != 0:
             postfix.append(stack.pop())
         return postfix
-#ExpressionTree   
-    class eT():
-        def __init__(self, value):
-            self.value = value
-            self.left = None
-            self.right = None
-
-    def inorder(self, t):
-        if t is not None:
-            self.inorder(t.left)
-            print((t.value),inorder(t.right))
-
-    def expressionTree(self):
-        stack = []
-        print(self.putInList(self.equa))
+#data   
+    def dataOfEquation(self):
+        #==================================
+        print('-------------------------------------------')
+        word1 = ''
+        word2 = ''
+        for n in self.putInList(self.equa):
+            word1 += n  + ' '
+        print('Origin = ',word1)
+        for n in self.convertPost():
+            word2 += n + ' '
+        print('Postfix = ',word2)
         print(self.convertPost())
-
-        for ch in self.convertPost():
-            if ch != '&+!': # operand
-                t = self.eT(ch)
-                stack.append(t)
-            # elif ch == '!':
-
-            else: # operator 
-                # ดึงเอาตัวอักษร
-                t = self.eT(ch)
-                t1 = stack.pop()
-                t2 = stack.pop()
-                # put in right and left
-                t.right = t1
-                t.left = t2
-
-                stack.append(t)
-        
-        t = stack.pop()           
-
-        return t
-
-        
+        #==================================
+        print('-------------------------------------------')
+        return None      
+# Test
+#--------------------------------------------------------------------        
 eq1 = boolExpStr("(I0&I1 + !(I1&I2))")
 eq2 = boolExpStr("!(1+0)")
 eq3 = boolExpStr("!(!(0+I0&1))")
@@ -119,5 +101,136 @@ eq4 = boolExpStr("(I0+!I1+!(I2))&(!I0+I1+I2)")
 eq5 = boolExpStr("!(I0&I1)+!(I1+I2)")
 eq6 = boolExpStr("(((I0&I1&!I2)+!I1)+I3)")
 
-# print(eq4.convertPost())
-print(eq1.expressionTree())
+#--------------------------------------------------------------------
+data = eq1.dataOfEquation()
+
+
+#--------------------------------------------------------------------
+
+pygame.init()
+pygame.display.set_caption('Expression Tree')
+
+clock = pygame.time.Clock()
+
+scr_w, scr_h = 800, 600
+screen = pygame.display.set_mode((scr_w, scr_h))
+surface = pygame.Surface( screen.get_size(), pygame.SRCALPHA)
+
+#--------------------------------------------------------------------
+BLUE = pygame.Color('#7FFFD4')
+BLACK = pygame.Color('#000000')
+radius = (scr_w**2 + scr_h**2)**(1/2)/40
+text_font = pygame.font.SysFont("leelawadeeui", int(radius*1.5))
+
+#--------------------------------------------------------------------
+class eT():
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def height(node):  #Ref https://www.geeksforgeeks.org/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/
+    if node is None: 
+        return 0 ;  
+    else : 
+
+        l_height = height(node.left) # ตรวจสอบทางซ้ายไปเรื่อยๆ
+        r_height = height(node.right) # ตรวจสอบทางขวาไปเรื่อยๆ
+  
+        # find which one larger
+        if (l_height > r_height): 
+            return l_height+1
+        else: 
+            return r_height+1
+
+def inorder(t): 
+	if t is not None: 
+		inorder(t.left) 
+		print(t.value,end ='')
+		inorder(t.right)
+
+def expressionTree(equation):        
+    stack = []
+    for ch in equation:
+
+        if ch not in '&+!': # operand
+            t = eT(ch)
+            stack.append(t)
+
+        elif ch == '!':
+            t = eT(ch)
+            t1 = stack.pop()
+            t.right = t1
+            stack.append(t)
+
+        else: # operator 
+            # ดึงเอาตัวอักษร
+            t = eT(ch)
+            t1 = stack.pop()
+            t2 = stack.pop()
+            # put in right and left
+            t.right = t1
+            t.left = t2
+
+
+            stack.append(t)
+
+    t = stack.pop()          
+
+    return t      
+def drawTree(node, x, y, dx, h):
+    if node is not None:
+
+        pygame.draw.circle(surface, BLUE, (x, y), radius)
+
+        #วาดเส้นเชื่อม
+        if node.left is not None:
+            pygame.draw.line(surface,BLUE ,[x,y],[x-dx,y+1/h*400],2)
+        if node.right is not None:
+            pygame.draw.line(surface,BLUE ,[x,y],[x+dx,y+1/h*400],2)
+        
+        # วาด ฝั่งทางซ้าย และ ทางขวา 
+        drawTree(node.left, x-dx, y+1/h*400, dx/h*3, h)
+        drawTree(node.right, x+dx, y+1/h*400, dx/h*3, h)
+    
+def drawText(node, x, y, dx, h):
+    if node :
+        text_surface = text_font.render(str(node.value), True , BLACK)
+        screen.blit(text_surface, (x-10, y-25))
+        
+        drawText(node.left, x-dx, y+1/h*400, dx/h*3, h)
+        drawText(node.right, x+dx, y+1/h*400, dx/h*3, h)
+        pygame.display.update()
+#--------------------------------------------------------------------
+# เปลี่ยน สมการ ได้ eq1-eq6
+anyeq = eq1.convertPost()
+node = expressionTree(anyeq)
+print(height(node))
+inorder(node)
+#--------------------------------------------------------------------
+running = True
+fps = 60
+#--------------------------------------------------------------------
+while running:
+    
+    clock.tick(fps)
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.image.save(screen, "screenshot.jpeg")
+            running = False
+            
+    h = height(node)
+
+    # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
+    drawText(node, scr_w/2, scr_h/h, scr_h/(1.5*h) ,h)
+    drawTree(node, scr_w/2, scr_h/h, scr_h/(1.5*h) ,h)
+    
+
+    screen.fill((255, 255, 255))
+    
+    screen.blit(surface, (0, 0))
+    pygame.display.update()
+
+
+
+pygame.quit()
