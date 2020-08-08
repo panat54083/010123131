@@ -1,12 +1,14 @@
 # 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1
-# ยังไม่สมบูณ์
+
+
 # 17.50 07/08/2020 แก้ไขเล็กน้อย
 # 01.55 08/08/2020 แก้ไขการแปลงเป็น postfix
 # 16.56 08/08/2020 เพิ่ม expression tree และแก้ไข postfix
 # 1.56 09/08/2020 แก้ไขการแปลง postfix และ เพิ่มการวาด pygame ปัญหาที่พบเจอ(ยังแก้ไม่ได้) ตัวอักษรกระพริบ และ ขนาดการสร้างวงกลมให้เข้ากับรุปแบบสมการไม่ดีอย่างที่ควร
-
+# 5.00 09/08/2020 แก้ไขการจัดตำแหน่งในการวาด  Tree (ยังไม่สามารถแก้ปัญหาตัวอักษรกระพริบได้)
 
 import pygame
+import math
 class boolExpStr():
     
     def __init__(self, equation = None):
@@ -88,7 +90,7 @@ class boolExpStr():
         for n in self.convertPost():
             word2 += n + ' '
         print('Postfix = ',word2)
-        print(self.convertPost())
+        # print(self.convertPost())
         #==================================
         print('-------------------------------------------')
         return None      
@@ -102,8 +104,8 @@ eq5 = boolExpStr("!(I0&I1)+!(I1+I2)")
 eq6 = boolExpStr("(((I0&I1&!I2)+!I1)+I3)")
 
 #--------------------------------------------------------------------
+#ไว้ตรวจสอบรูปแบบของ Postfix
 data = eq1.dataOfEquation()
-
 
 #--------------------------------------------------------------------
 
@@ -112,7 +114,7 @@ pygame.display.set_caption('Expression Tree')
 
 clock = pygame.time.Clock()
 
-scr_w, scr_h = 800, 600
+scr_w, scr_h = 1000, 1000
 screen = pygame.display.set_mode((scr_w, scr_h))
 surface = pygame.Surface( screen.get_size(), pygame.SRCALPHA)
 
@@ -178,35 +180,37 @@ def expressionTree(equation):
     t = stack.pop()          
 
     return t      
-def drawTree(node, x, y, dx, h):
+def drawTree(node, x, y, dx, h): #ref https://gist.github.com/Liwink/b81e726ad89df8b0754a3a1d0c40d0b4
     if node is not None:
 
         pygame.draw.circle(surface, BLUE, (x, y), radius)
-
         #วาดเส้นเชื่อม
         if node.left is not None:
             pygame.draw.line(surface,BLUE ,[x,y],[x-dx,y+1/h*400],2)
         if node.right is not None:
             pygame.draw.line(surface,BLUE ,[x,y],[x+dx,y+1/h*400],2)
-        
+        pygame.display.update()
+
         # วาด ฝั่งทางซ้าย และ ทางขวา 
-        drawTree(node.left, x-dx, y+1/h*400, dx/h*3, h)
-        drawTree(node.right, x+dx, y+1/h*400, dx/h*3, h)
+        drawTree(node.left, x-dx, y+1/h*400, dx/2, h)
+        drawTree(node.right, x+dx, y+1/h*400, dx/2, h)
     
 def drawText(node, x, y, dx, h):
     if node :
         text_surface = text_font.render(str(node.value), True , BLACK)
-        screen.blit(text_surface, (x-10, y-25))
-        
-        drawText(node.left, x-dx, y+1/h*400, dx/h*3, h)
-        drawText(node.right, x+dx, y+1/h*400, dx/h*3, h)
-        pygame.display.update()
+        text_rect = text_surface.get_rect()
+        text_rect.center = (x, y)
+        screen.blit(text_surface, (text_rect))
+
+        drawText(node.left, x-dx, y+1/h*400, dx/2, h)
+        drawText(node.right, x+dx, y+1/h*400, dx/2, h)
+    
 #--------------------------------------------------------------------
 # เปลี่ยน สมการ ได้ eq1-eq6
 anyeq = eq1.convertPost()
 node = expressionTree(anyeq)
-print(height(node))
-inorder(node)
+print('height of nodes is ',height(node))
+# inorder(node)
 #--------------------------------------------------------------------
 running = True
 fps = 60
@@ -220,17 +224,18 @@ while running:
             running = False
             
     h = height(node)
-
-    # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
-    drawText(node, scr_w/2, scr_h/h, scr_h/(1.5*h) ,h)
-    drawTree(node, scr_w/2, scr_h/h, scr_h/(1.5*h) ,h)
     
-
+    # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
+    
+    drawText(node, scr_w/2, (scr_h-100)/h, scr_w/math.log(h*15) ,h)
+    drawTree(node, scr_w/2, (scr_h-100)/h, scr_w/math.log(h*15) ,h)
+    
+    
     screen.fill((255, 255, 255))
     
     screen.blit(surface, (0, 0))
     pygame.display.update()
 
-
+    
 
 pygame.quit()
