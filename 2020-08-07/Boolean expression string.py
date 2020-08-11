@@ -1,5 +1,5 @@
 # 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1
-
+# PyGame version: 2.0.0.dev10
 
 # 17.50 07/08/2020 แก้ไขเล็กน้อย
 # 01.55 08/08/2020 แก้ไขการแปลงเป็น postfix
