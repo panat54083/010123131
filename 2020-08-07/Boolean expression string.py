@@ -123,7 +123,6 @@ BLUE = pygame.Color('#7FFFD4')
 BLACK = pygame.Color('#000000')
 radius = (scr_w**2 + scr_h**2)**(1/2)/40
 text_font_for_drawingtree = pygame.font.SysFont("leelawadeeui", int(radius*1.5))
-text_font_for_table = pygame.font.SysFont("leelawadeeui", 40)
 #--------------------------------------------------------------------
 class eT():
     def __init__(self, value):
@@ -235,8 +234,6 @@ fps = 60
 h = height(node)
 #--------------------------------------------------------------------
 
-
-# drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,int(h))  
 drawTree(node, scr_w//2, (scr_h-100)//h, scr_w//math.log(h*15) ,h)
       
 def drawExpression():
@@ -250,9 +247,6 @@ def drawExpression():
                 pygame.image.save(screen, "screenshot.jpeg")
                 running = False
 
-              
-        
-        
         # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
             # pygame.display.update()
         
@@ -262,41 +256,6 @@ def drawExpression():
         screen.blit(surface, (0, 0))
         pygame.display.update()
 
-        
-
     pygame.quit()
 
 drawExpression()
-def drawTable():
-    global running
-
-    size = scr_w//(len(variable))
-    x = 0
-
-    while running:
-        
-        clock.tick(fps)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.image.save(screen, "screenshot.jpeg")
-                running = False
-
-    
-    
-        for ela in variable:
-            text_surface = text_font_for_table.render(str(ela), True, BLACK)
-            text_rect = text_surface.get_rect()
-            text_rect.center = (x,0)
-            surface.blit(text_surface, (text_rect))
-        
-            x += size
-
-        screen.fill((255, 255, 255))
-        screen.blit(surface, (0, 0))
-        pygame.display.update()
-
-        
-
-    pygame.quit()
-
-# drawTable()
