@@ -1,14 +1,17 @@
 # 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1
-# PyGame version: 2.0.0.dev10
+# PyGame version: 1.9.6
 
 # 17.50 07/08/2020 แก้ไขเล็กน้อย
 # 01.55 08/08/2020 แก้ไขการแปลงเป็น postfix
 # 16.56 08/08/2020 เพิ่ม expression tree และแก้ไข postfix
 # 1.56 09/08/2020 แก้ไขการแปลง postfix และ เพิ่มการวาด pygame ปัญหาที่พบเจอ(ยังแก้ไม่ได้) ตัวอักษรกระพริบ และ ขนาดการสร้างวงกลมให้เข้ากับรุปแบบสมการไม่ดีอย่างที่ควร
-# 5.00 09/08/2020 แก้ไขการจัดตำแหน่งในการวาด  Tree (ยังไม่สามารถแก้ปัญหาตัวอักษรกระพริบได้)
+# 5.00 09/08/2020 แก้ไขการจัดตำแหน่งในการวาด  Tree (ยังไม่สามารถแก้ปัญหาตัวอักษรกระพริบได้
+# 13.07 12/08/2020 update version pygame แก้ไขให้โค้ดสามารถเช้ากับ version pygame 1.9.6 (ก่อนหน้าเป็น 2.0.0 dev10)
+
 
 import pygame
 import math
+print('PyGame version: {}'.format (pygame.version.ver))
 class boolExpStr():
     
     def __init__(self, equation = None):
@@ -183,12 +186,12 @@ def expressionTree(equation):
 def drawTree(node, x, y, dx, h): #ref https://gist.github.com/Liwink/b81e726ad89df8b0754a3a1d0c40d0b4
     if node is not None:
 
-        pygame.draw.circle(surface, BLUE, (x, y), radius)
+        pygame.draw.circle(surface, BLUE, (int(x), int(y)), int(radius))
         #วาดเส้นเชื่อม
         if node.left is not None:
-            pygame.draw.line(surface,BLUE ,[x,y],[x-dx,y+1/h*400],2)
+            pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x-dx),int(y+1/h*400)],2)
         if node.right is not None:
-            pygame.draw.line(surface,BLUE ,[x,y],[x+dx,y+1/h*400],2)
+            pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x+dx),int(y+1/h*400)],2)
         pygame.display.update()
 
         # วาด ฝั่งทางซ้าย และ ทางขวา 
@@ -199,7 +202,7 @@ def drawText(node, x, y, dx, h):
     if node :
         text_surface = text_font.render(str(node.value), True , BLACK)
         text_rect = text_surface.get_rect()
-        text_rect.center = (x, y)
+        text_rect.center = (int(x), int(y))
         screen.blit(text_surface, (text_rect))
 
         drawText(node.left, x-dx, y+1/h*400, dx/2, h)
@@ -227,15 +230,14 @@ while running:
     
     # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
     
-    drawText(node, scr_w/2, (scr_h-100)/h, scr_w/math.log(h*15) ,h)
-    drawTree(node, scr_w/2, (scr_h-100)/h, scr_w/math.log(h*15) ,h)
+    drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,int(h))
+    
+    drawTree(node, scr_w//2, (scr_h-100)//h, scr_w//math.log(h*15) ,h)
     
     
     screen.fill((255, 255, 255))
     
     screen.blit(surface, (0, 0))
-    pygame.display.update()
-
-    
+    # pygame.display.update()
 
 pygame.quit()
