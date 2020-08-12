@@ -7,15 +7,22 @@
 # 1.56 09/08/2020 แก้ไขการแปลง postfix และ เพิ่มการวาด pygame ปัญหาที่พบเจอ(ยังแก้ไม่ได้) ตัวอักษรกระพริบ และ ขนาดการสร้างวงกลมให้เข้ากับรุปแบบสมการไม่ดีอย่างที่ควร
 # 5.00 09/08/2020 แก้ไขการจัดตำแหน่งในการวาด  Tree (ยังไม่สามารถแก้ปัญหาตัวอักษรกระพริบได้
 # 13.07 12/08/2020 update version pygame แก้ไขให้โค้ดสามารถเช้ากับ version pygame 1.9.6 (ก่อนหน้าเป็น 2.0.0 dev10)
-
+# 1.314 13/08/2020 แก้ไขอักษรกระพริบ
 
 import pygame
 import math
-print('PyGame version: {}'.format (pygame.version.ver))
 class boolExpStr():
     
     def __init__(self, equation = None):
         self.equa = equation.replace(" ","")
+
+    def findVariable(self):
+        lista = list()
+        for ela in self.putInList(self.equa):
+            if ela in ['I0', 'I1', 'I2', '0', '1']:
+                lista.append(ela)
+
+        return list(set(lista))
 
 #checkOperator        
     def isOperator(self, c):
@@ -97,20 +104,10 @@ class boolExpStr():
         #==================================
         print('-------------------------------------------')
         return None      
-# Test
-#--------------------------------------------------------------------        
-eq1 = boolExpStr("(I0&I1 + !(I1&I2))")
-eq2 = boolExpStr("!(1+0)")
-eq3 = boolExpStr("!(!(0+I0&1))")
-eq4 = boolExpStr("(I0+!I1+!(I2))&(!I0+I1+I2)")
-eq5 = boolExpStr("!(I0&I1)+!(I1+I2)")
-eq6 = boolExpStr("(((I0&I1&!I2)+!I1)+I3)")
 
 #--------------------------------------------------------------------
-#ไว้ตรวจสอบรูปแบบของ Postfix
-data = eq1.dataOfEquation()
-
-#--------------------------------------------------------------------
+# ---------------------------PYGAME---------------------------------#
+#--------------------------------------------------------------------  
 
 pygame.init()
 pygame.display.set_caption('Expression Tree')
@@ -125,8 +122,8 @@ surface = pygame.Surface( screen.get_size(), pygame.SRCALPHA)
 BLUE = pygame.Color('#7FFFD4')
 BLACK = pygame.Color('#000000')
 radius = (scr_w**2 + scr_h**2)**(1/2)/40
-text_font = pygame.font.SysFont("leelawadeeui", int(radius*1.5))
-
+text_font_for_drawingtree = pygame.font.SysFont("leelawadeeui", int(radius*1.5))
+text_font_for_table = pygame.font.SysFont("leelawadeeui", 40)
 #--------------------------------------------------------------------
 class eT():
     def __init__(self, value):
@@ -187,12 +184,14 @@ def drawTree(node, x, y, dx, h): #ref https://gist.github.com/Liwink/b81e726ad89
     if node is not None:
 
         pygame.draw.circle(surface, BLUE, (int(x), int(y)), int(radius))
+        pygame.display.update()
         #วาดเส้นเชื่อม
+        
         if node.left is not None:
             pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x-dx),int(y+1/h*400)],2)
         if node.right is not None:
             pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x+dx),int(y+1/h*400)],2)
-        pygame.display.update()
+        
 
         # วาด ฝั่งทางซ้าย และ ทางขวา 
         drawTree(node.left, x-dx, y+1/h*400, dx/2, h)
@@ -200,44 +199,104 @@ def drawTree(node, x, y, dx, h): #ref https://gist.github.com/Liwink/b81e726ad89
     
 def drawText(node, x, y, dx, h):
     if node :
-        text_surface = text_font.render(str(node.value), True , BLACK)
+        text_surface = text_font_for_drawingtree.render(str(node.value), True , BLACK)
         text_rect = text_surface.get_rect()
         text_rect.center = (int(x), int(y))
-        screen.blit(text_surface, (text_rect))
+        surface.blit(text_surface, (text_rect))
+        pygame.display.update()
 
         drawText(node.left, x-dx, y+1/h*400, dx/2, h)
         drawText(node.right, x+dx, y+1/h*400, dx/2, h)
-    
+
 #--------------------------------------------------------------------
+# Test
+#--------------------------------------------------------------------        
+eq1 = boolExpStr("(I0&I1 + !(I1&I2))")
+eq2 = boolExpStr("!(1+0)")
+eq3 = boolExpStr("!(!(0+I0&1))")
+eq4 = boolExpStr("(I0+!I1+!(I2))&(!I0+I1+I2)")
+eq5 = boolExpStr("!(I0&I1)+!(I1+I2)")
+eq6 = boolExpStr("(((I0&I1&!I2)+!I1)+I3)")
+
+#--------------------------------------------------------------------
+#ไว้ตรวจสอบรูปแบบของ Postfix
+data = eq1.dataOfEquation()
+
 # เปลี่ยน สมการ ได้ eq1-eq6
 anyeq = eq1.convertPost()
 node = expressionTree(anyeq)
 print('height of nodes is ',height(node))
+variable  = eq1.findVariable()
+print(eq1.findVariable())
 # inorder(node)
 #--------------------------------------------------------------------
 running = True
 fps = 60
+h = height(node)
 #--------------------------------------------------------------------
-while running:
-    
-    clock.tick(fps)
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.image.save(screen, "screenshot.jpeg")
-            running = False
-            
-    h = height(node)
-    
-    # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
-    
-    drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,int(h))
-    
-    drawTree(node, scr_w//2, (scr_h-100)//h, scr_w//math.log(h*15) ,h)
-    
-    
-    screen.fill((255, 255, 255))
-    
-    screen.blit(surface, (0, 0))
-    # pygame.display.update()
 
-pygame.quit()
+
+# drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,int(h))  
+drawTree(node, scr_w//2, (scr_h-100)//h, scr_w//math.log(h*15) ,h)
+      
+def drawExpression():
+    global running
+
+    while running:
+        
+        clock.tick(fps)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.image.save(screen, "screenshot.jpeg")
+                running = False
+
+              
+        
+        
+        # node จุดแกน x จุดแกน y ตัวแปรเปลี่ยนแกน ความสูง
+            # pygame.display.update()
+        
+        drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,int(h))  
+        
+        screen.fill((255, 255, 255))
+        screen.blit(surface, (0, 0))
+        pygame.display.update()
+
+        
+
+    pygame.quit()
+
+drawExpression()
+def drawTable():
+    global running
+
+    size = scr_w//(len(variable))
+    x = 0
+
+    while running:
+        
+        clock.tick(fps)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.image.save(screen, "screenshot.jpeg")
+                running = False
+
+    
+    
+        for ela in variable:
+            text_surface = text_font_for_table.render(str(ela), True, BLACK)
+            text_rect = text_surface.get_rect()
+            text_rect.center = (x,0)
+            surface.blit(text_surface, (text_rect))
+        
+            x += size
+
+        screen.fill((255, 255, 255))
+        screen.blit(surface, (0, 0))
+        pygame.display.update()
+
+        
+
+    pygame.quit()
+
+# drawTable()
