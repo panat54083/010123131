@@ -14,6 +14,7 @@
 import pygame
 import math
 from itertools import product
+
 class boolExpStr():
     
     def __init__(self, equation = None):
@@ -381,16 +382,16 @@ drawExpression()
 #--------------------------------------------------------------------
 class ExpressionInTxt:
     def __init__(self, textName):
-        self.textName = textName
+        self.textName = textName # รับ input ที่เป็นชื่อ ไฟล์
 
-    def readText(self):
+    def readText(self): # อ่าน บรรทัดแรกเพื่อดึงสมการออกมา
         with open(self.textName, 'r') as file_:
             line = file_.readline()
             print('line = ',line)
             return line
 
 
-    def writeTable(self):
+    def writeTable(self): # นำสมการที่ได้ไปทำขั้นตอนการสร้าง table
         with open(self.textName, 'a') as file_:
             if self.readText() == False:
                 return False
