@@ -1,6 +1,6 @@
 # 6201012610052 Assingment สำหรับ Boolean expression string ในข้อที่ 1 และ 2
 # PyGame version: 1.9.6
-#------------------------Uncomplete----------------------------
+#------------------------Complete----------------------------
 # 17.50 07/08/2020 แก้ไขเล็กน้อย
 # 01.55 08/08/2020 แก้ไขการแปลงเป็น postfix
 # 16.56 08/08/2020 เพิ่ม expression tree และแก้ไข postfix
@@ -9,6 +9,7 @@
 # 13.07 12/08/2020 update version pygame แก้ไขให้โค้ดสามารถเช้ากับ version pygame 1.9.6 (ก่อนหน้าเป็น 2.0.0 dev10)
 # 1.31 13/08/2020 แก้ไขอักษรกระพริบ
 # 1.53 18/08/2020 เพิ่มการสร้างตาราง หมายเหตุ ยังไม่ได้สรา้งให้สามารถรับบ input จาก .txt และ output ออกไปใน .txt
+# 8.11 18/08/2020 เพิ่มการสร้างตารางที่ input เป็น .txt และสร้าง output เข้าไปในไฟล์ .txt ของ input
 
 import pygame
 import math
@@ -378,3 +379,96 @@ drawText(node, int(scr_w//2), int((scr_h-100)//h), int(scr_w//math.log(h*15)) ,i
 drawExpression()
 
 #--------------------------------------------------------------------
+class ExpressionInTxt:
+    def __init__(self, textName):
+        self.textName = textName
+
+    def readText(self):
+        with open(self.textName, 'r') as file_:
+            line = file_.readline()
+            print('line = ',line)
+            return line
+
+
+    def writeTable(self):
+        with open(self.textName, 'a') as file_:
+            if self.readText() == False:
+                return False
+
+            else:
+                file_.write('\n')
+                file_.write('------------------------------------------------------------')
+                file_.write('\n')
+                file_.write('------------------------Truth Table-------------------------')
+                file_.write('\n')
+                file_.write('------------------------------------------------------------')
+                file_.write('\n')
+                
+                equation = self.readText() # สมการ
+                equation.replace('\n', '')
+                input_ = boolExpStr(equation)
+                print(equation)
+                variables = input_.findVariable() #ตัวแปรในสมการ
+                print(variables)
+                num_variables = len(variables) #จำนวนตัวแปร
+
+                data_list = []
+                head = []
+
+                for var in variables: # หัวข้อของตาราง
+                    head.append(var)
+                head.append(equation)
+
+                inputs = product([int(True), int(False)], repeat = num_variables) # ทำการเก็บค่าแต่ละกรณี
+                for boolean in inputs:
+                    data_list.append(list(boolean))
+
+                for l in range(len(data_list)):
+                    new_equa = equation
+                    # print(new_equa)
+                    for k in range(num_variables):
+                        new_equa = new_equa.replace(variables[k],str(data_list[l][k])) # ทำการเปลี่ยนตัวแปรในสมการให้อยู่ในรูปของ T, F
+                    # print(data_list[l])
+                    # print(new_equa)
+                    # ทำการใช้สมการใหม่ ในการหา คำตอบ
+                    eachEqua = boolExpStr(new_equa)
+                    root = expressionTree(eachEqua.convertPost())
+                    result = evaluateExpressionTree(root)
+                    data_list[l].append(result) # ใส่คำตอบ
+            
+                # สร้างหัวของตาราง
+                for f in head:
+                    file_.write(f)
+                    file_.write(' | ')
+                file_.write('\n')   
+                new = ''
+                list_ = []
+                # สร้างข้อมูล Truth Table 
+                for i in range(len(data_list)):
+                    for j in range(len(data_list[i])):
+                        lenStr = len(head[j]) - len(str(int(data_list[i][j])))
+                        left_lenStr = (lenStr)//2
+                        right_lenStr = len(head[j]) - left_lenStr - len(str(int(data_list[i][j])))
+                        new = ' '*left_lenStr + str(int(data_list[i][j])) + ' '*right_lenStr
+                        file_.write(new)
+                        file_.write(' | ')
+                    file_.write('\n')
+                file_.write('------------------------------------------------------------')
+                file_.write('\n')
+
+                return True
+
+#-------------------------------------------------------------------#
+#                               Text                                #
+#-------------------------------------------------------------------#
+# สร้างไฟล์ ที่บรรทัดแรก มีแต่โจทย์ เช่น "(I0 + I1)"
+# 'input1.txt'
+# 'input2.txt'
+# 'input3.txt'
+# 'input4.txt'
+# 'input5.txt'
+# 'input6.txt'
+
+input_file = ExpressionInTxt('input1.txt')
+# input_file.readText()
+input_file.writeTable()
