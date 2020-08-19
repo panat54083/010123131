@@ -10,11 +10,11 @@
 # 1.31 13/08/2020 แก้ไขอักษรกระพริบ
 # 1.53 18/08/2020 เพิ่มการสร้างตาราง หมายเหตุ ยังไม่ได้สรา้งให้สามารถรับบ input จาก .txt และ output ออกไปใน .txt
 # 8.11 18/08/2020 เพิ่มการสร้างตารางที่ input เป็น .txt และสร้าง output เข้าไปในไฟล์ .txt ของ input
+# 19.25 19/08/2020 ทำการปรับให้ Not operator ให้ child อยู่ตรงกลาง
 
 import pygame
 import math
 from itertools import product
-
 class boolExpStr():
     
     def __init__(self, equation = None):
@@ -173,6 +173,7 @@ class eT(): # Class for create Node
         self.value = value
         self.left = None
         self.right = None
+        self.center = False
 # Create Expression tree (input must be postfix form)
 def expressionTree(equation):  
     stack = []
@@ -185,7 +186,9 @@ def expressionTree(equation):
         elif ch == '!':
             t = eT(ch)
             t1 = stack.pop()
+            t.center = True
             t.right = t1
+            
             stack.append(t)
 
         else: # operator 
@@ -258,12 +261,18 @@ def drawTree(node, x, y, dx, h): #ref https://gist.github.com/Liwink/b81e726ad89
             #(x1, y1),(x2, y2)
             pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x-dx),int(y+1/h*300)],2)
         if node.right is not None:
-            pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x+dx),int(y+1/h*300)],2)
-        
+            if node.center is not True:
+                pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x+dx),int(y+1/h*300)],2)
+            else:
+                pygame.draw.line(surface,BLUE ,[int(x),int(y)],[int(x),int(y+1/h*300)],2)
         # recursive until out of node or node is None
         # Draw the left and right sides.
         drawTree(node.left, x-dx, y+1/h*300, dx/2, h)
-        drawTree(node.right, x+dx, y+1/h*300, dx/2, h)
+        if node.center is not True:
+            drawTree(node.right, x+dx, y+1/h*300, dx/2, h)
+        else: # กรณีคือ root = Not
+            drawTree(node.right, x, y+1/h*300, dx/2, h)
+
         return True
 
 # Drawing Text
@@ -280,7 +289,10 @@ def drawText(node, x, y, dx, h):
         # recursive until out of node or node is None
         # Draw the left and right sides.
         drawText(node.left, x-dx, y+1/h*300, dx/2, h)
-        drawText(node.right, x+dx, y+1/h*300, dx/2, h)
+        if node.center is not True:
+            drawText(node.right, x+dx, y+1/h*300, dx/2, h)
+        else:
+            drawText(node.right, x, y+1/h*300, dx/2, h)
         return True
 
 # main in Pygame
@@ -456,7 +468,7 @@ class ExpressionInTxt:
                     file_.write('\n')
                 file_.write('------------------------------------------------------------')
                 file_.write('\n')
-
+                print('Writing table is Done')
                 return True
 
 #-------------------------------------------------------------------#
@@ -470,6 +482,6 @@ class ExpressionInTxt:
 # 'input5.txt'
 # 'input6.txt'
 
-input_file = ExpressionInTxt('input1.txt')
+# input_file = ExpressionInTxt('input1.txt')
 # input_file.readText()
-input_file.writeTable()
+# input_file.writeTable()
