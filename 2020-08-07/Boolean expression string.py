@@ -10,7 +10,7 @@
 # 1.31 13/08/2020 แก้ไขอักษรกระพริบ
 # 1.53 18/08/2020 เพิ่มการสร้างตาราง หมายเหตุ ยังไม่ได้สรา้งให้สามารถรับบ input จาก .txt และ output ออกไปใน .txt
 # 8.11 18/08/2020 เพิ่มการสร้างตารางที่ input เป็น .txt และสร้าง output เข้าไปในไฟล์ .txt ของ input
-# 19.38 19/08/2020 ทำการปรับให้ Not operator ให้ child อยู่ตรงกลาง
+# 19.56 19/08/2020 ทำการปรับให้ Not operator ให้ child อยู่ตรงกลาง เปลีายนชื่อตัวแปรและฟังชันก์ของโค้ดให้เหมาะสม
 
 import pygame
 import math
@@ -20,35 +20,35 @@ class boolExpStr():
     def __init__(self, equation = None):
         self.equa = equation.replace(" ","") # ตัดวงเล็บ
 
-    def isOperand(self, c):
-        if c not in set('+&!()'):
+    def isOperand(self, ch):
+        if ch not in set('+&!()'):
             return True
 
     # show input
-    def stringOfEqua(self): 
-        stringOfEqua = ''
-        for string in self.equa:
-            stringOfEqua += string
-        return stringOfEqua
+    def str_equation(self): 
+        str_equation = ''
+        for ch in self.equa:
+            str_equation += ch
+        return str_equation
 
     # find variables in equation
-    def findVariable(self): 
-        lista = list()
-        for ela in self.putInList(self.equa):
-            # if ela in ['I0', 'I1', 'I2','I3']:
-            if self.isOperand(ela):
-                lista.append(ela)
-        return sorted(list(set(lista)))
+    def findVar(self): 
+        all_Var = list()
+        for ch in self.list_equation(self.equa):
+            # if ch in ['I0', 'I1', 'I2','I3']:
+            if self.isOperand(ch):
+                all_Var.append(ch)
+        return sorted(list(set(all_Var)))
 
     # checkOperator        
-    def isOperator(self, c):
-        if c == '+' or c == '&' or c == '!':
+    def isOperator(self, ch):
+        if ch == '+' or ch == '&' or ch == '!':
             return True
         else:
             return False
 
     #put equation into list 
-    def putInList(self,equa): 
+    def list_equation(self, equa): 
         SYMBOLS = set('+&!()')
 
         mark = 0 
@@ -67,10 +67,10 @@ class boolExpStr():
 
     # make the equation to be postfix for creating expression Tree 
     def convertPost(self):
-        equa = self.putInList(self.equa)
+        equation = self.list_equation(self.equa)
         openC = 0
 
-        for ch in equa: # Check if equation have wrong barcket
+        for ch in equation: # Check if equation have wrong barcket
             if ch == '(':
                 openC += 1
             elif ch == ')':
@@ -86,7 +86,7 @@ class boolExpStr():
         postfix = []
         stack = []
 
-        for ch in equa:
+        for ch in equation:
             if self.isOperand(ch) :
                 postfix.append(ch)
             elif ch in '&!+':
@@ -105,65 +105,63 @@ class boolExpStr():
         return postfix
 
     # Check data of Equation    
-    def dataOfEquation(self):
+    def cheack_dataEqua(self):
         #==================================
         print('------------------------------------------------------------')
         word1 = ''
         word2 = ''
-        for n in self.putInList(self.equa):
-            word1 += n  + ' '
+        for ch in self.list_equation(self.equa):
+            word1 += ch  + ' '
         print('Origin = ',word1)
-        for n in self.convertPost():
-            word2 += n + ' '
+        for ch in self.convertPost():
+            word2 += ch + ' '
         print('Postfix = ',word2)
-        print('Variable are = ', self.findVariable())
+        print('Variable are = ', self.findVar())
         #==================================
         print('------------------------------------------------------------')
         return None
     
     def createTable(self):
         print('------------------------------------------------------------')
-        variables = self.findVariable()
-        num_variables = len(variables)
-        # nunberofrow = 2**num_variables
-        data_list = []
-        head = []
+        var_equation = self.findVar()
+        num_var_equation = len(var_equation)
+        case_list = []
+        fields = []
 
         # สร้างหัวของตาราง
-        for var in variables:
-            head.append(var)
-        head.append(self.stringOfEqua()) #stringOfEqua คือสมการ
+        for var in var_equation:
+            fields.append(var)
+        fields.append(self.str_equation()) #str_equation คือสมการ
 
-        inputs = product([int(True), int(False)], repeat = num_variables)
+        inputs = product([int(True), int(False)], repeat = num_var_equation)
         for boolean in inputs:
-            data_list.append(list(boolean))
+            case_list.append(list(boolean))
         
         
-        for l in range(len(data_list)):
-            new_equa = self.stringOfEqua()
-            for k in range(num_variables):
-                new_equa = new_equa.replace(variables[k],str(data_list[l][k])) # ทำการเปลี่ยนตัวแปรในสมการให้อยู่ในรูปของ T, F
-            # print(data_list[l])
-            # print(new_equa)
+        for l in range(len(case_list)):
+            new_equa = self.str_equation()
+            for k in range(num_var_equation):
+                new_equa = new_equa.replace(var_equation[k],str(case_list[l][k])) # ทำการเปลี่ยนตัวแปรในสมการให้อยู่ในรูปของ T, F
+
             # ทำการใช้สมการใหม่ ในการหา คำตอบ
             eachEqua = boolExpStr(new_equa)
             root = expressionTree(eachEqua.convertPost())
             result = evaluateExpressionTree(root)
-            data_list[l].append(result) # ใส่คำตอบ
+            case_list[l].append(result) # ใส่คำตอบ
 
         # สร้างหัวของตาราง
-        for f in head:
+        for f in fields:
             print(f, end = ' | ')
         print('\n')   
         new = ''
         list_ = []
         # สร้างข้อมูล Truth Table 
-        for i in range(len(data_list)):
-            for j in range(len(data_list[i])):
-                lenStr = len(head[j]) - len(str(int(data_list[i][j])))
+        for i in range(len(case_list)):
+            for j in range(len(case_list[i])):
+                lenStr = len(fields[j]) - len(str(int(case_list[i][j])))
                 left_lenStr = (lenStr)//2
-                right_lenStr = len(head[j]) - left_lenStr - len(str(int(data_list[i][j])))
-                new = ' '*left_lenStr + str(int(data_list[i][j])) + ' '*right_lenStr
+                right_lenStr = len(fields[j]) - left_lenStr - len(str(int(case_list[i][j])))
+                new = ' '*left_lenStr + str(int(case_list[i][j])) + ' '*right_lenStr
                 print(new, end = ' | ')
             print('\n')
         print('------------------------------------------------------------')
@@ -347,7 +345,7 @@ eq = boolExpStr(listOfEquation[N-1])
 #--------------------------------------------------------------------
 # main Variable
 anyeq = eq.convertPost() # Convert infix to postfix
-variable  = eq.findVariable() # variabel in equation
+variable  = eq.findVar() # variabel in equation
 node = expressionTree(eq.convertPost()) # Create Node from equation
 
 running = True
@@ -356,7 +354,7 @@ h = height(node)
 
 #--------------------------------------------------------------------
 # Cheack in foramtion of Equation
-eq.dataOfEquation()
+eq.cheack_dataEqua()
 print('height of nodes is ',height(node))
 
 #--------------------------------------------------------------------
@@ -384,7 +382,7 @@ text_font_for_label = pygame.font.SysFont("comicsansms", int(radius*2))
 
 #--------------------------------------------------------------------
 # Label
-text = text_font_for_label.render(str(eq.stringOfEqua()), True, BLACK)
+text = text_font_for_label.render(str(eq.str_equation()), True, BLACK)
 text_rect_label = text.get_rect()
 text_rect_label.center = (text.get_width()//2,text.get_height()//2)
 
@@ -428,48 +426,48 @@ class ExpressionInTxt:
                 equation.replace('\n', '')
                 input_ = boolExpStr(equation)
                 print(equation)
-                variables = input_.findVariable() #ตัวแปรในสมการ
-                print(variables)
-                num_variables = len(variables) #จำนวนตัวแปร
+                var_equation = input_.findVar() #ตัวแปรในสมการ
+                print(var_equation)
+                num_var_equation = len(var_equation) #จำนวนตัวแปร
 
-                data_list = []
-                head = []
+                case_list = []
+                fields = []
 
-                for var in variables: # หัวข้อของตาราง
-                    head.append(var)
-                head.append(equation)
+                for var in var_equation: # หัวข้อของตาราง
+                    fields.append(var)
+                fields.append(equation)
 
-                inputs = product([int(True), int(False)], repeat = num_variables) # ทำการเก็บค่าแต่ละกรณี
+                inputs = product([int(True), int(False)], repeat = num_var_equation) # ทำการเก็บค่าแต่ละกรณี
                 for boolean in inputs:
-                    data_list.append(list(boolean))
+                    case_list.append(list(boolean))
 
-                for l in range(len(data_list)):
+                for l in range(len(case_list)):
                     new_equa = equation
                     # print(new_equa)
-                    for k in range(num_variables):
-                        new_equa = new_equa.replace(variables[k],str(data_list[l][k])) # ทำการเปลี่ยนตัวแปรในสมการให้อยู่ในรูปของ T, F
-                    # print(data_list[l])
+                    for k in range(num_var_equation):
+                        new_equa = new_equa.replace(var_equation[k],str(case_list[l][k])) # ทำการเปลี่ยนตัวแปรในสมการให้อยู่ในรูปของ T, F
+                    # print(case_list[l])
                     # print(new_equa)
                     # ทำการใช้สมการใหม่ ในการหา คำตอบ
                     eachEqua = boolExpStr(new_equa)
                     root = expressionTree(eachEqua.convertPost())
                     result = evaluateExpressionTree(root)
-                    data_list[l].append(result) # ใส่คำตอบ
+                    case_list[l].append(result) # ใส่คำตอบ
             
                 # สร้างหัวของตาราง
-                for f in head:
+                for f in fields:
                     file_.write(f)
                     file_.write(' | ')
                 file_.write('\n')   
                 new = ''
                 list_ = []
                 # สร้างข้อมูล Truth Table 
-                for i in range(len(data_list)):
-                    for j in range(len(data_list[i])):
-                        lenStr = len(head[j]) - len(str(int(data_list[i][j])))
+                for i in range(len(case_list)):
+                    for j in range(len(case_list[i])):
+                        lenStr = len(fields[j]) - len(str(int(case_list[i][j])))
                         left_lenStr = (lenStr)//2
-                        right_lenStr = len(head[j]) - left_lenStr - len(str(int(data_list[i][j])))
-                        new = ' '*left_lenStr + str(int(data_list[i][j])) + ' '*right_lenStr
+                        right_lenStr = len(fields[j]) - left_lenStr - len(str(int(case_list[i][j])))
+                        new = ' '*left_lenStr + str(int(case_list[i][j])) + ' '*right_lenStr
                         file_.write(new)
                         file_.write(' | ')
                     file_.write('\n')
