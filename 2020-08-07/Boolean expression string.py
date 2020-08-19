@@ -10,7 +10,7 @@
 # 1.31 13/08/2020 แก้ไขอักษรกระพริบ
 # 1.53 18/08/2020 เพิ่มการสร้างตาราง หมายเหตุ ยังไม่ได้สรา้งให้สามารถรับบ input จาก .txt และ output ออกไปใน .txt
 # 8.11 18/08/2020 เพิ่มการสร้างตารางที่ input เป็น .txt และสร้าง output เข้าไปในไฟล์ .txt ของ input
-# 19.25 19/08/2020 ทำการปรับให้ Not operator ให้ child อยู่ตรงกลาง
+# 19.38 19/08/2020 ทำการปรับให้ Not operator ให้ child อยู่ตรงกลาง
 
 import pygame
 import math
@@ -19,6 +19,10 @@ class boolExpStr():
     
     def __init__(self, equation = None):
         self.equa = equation.replace(" ","") # ตัดวงเล็บ
+
+    def isOperand(self, c):
+        if c not in set('+&!()'):
+            return True
 
     # show input
     def stringOfEqua(self): 
@@ -31,7 +35,8 @@ class boolExpStr():
     def findVariable(self): 
         lista = list()
         for ela in self.putInList(self.equa):
-            if ela in ['I0', 'I1', 'I2','I3']:
+            # if ela in ['I0', 'I1', 'I2','I3']:
+            if self.isOperand(ela):
                 lista.append(ela)
         return sorted(list(set(lista)))
 
@@ -65,10 +70,10 @@ class boolExpStr():
         equa = self.putInList(self.equa)
         openC = 0
 
-        for ea in equa: # Check if equation have wrong barcket
-            if ea == '(':
+        for ch in equa: # Check if equation have wrong barcket
+            if ch == '(':
                 openC += 1
-            elif ea == ')':
+            elif ch == ')':
                 openC -= 1
         if openC != 0:
             print("Error equation, pls check barcket")
@@ -77,13 +82,12 @@ class boolExpStr():
             elif openC < 0:
                 return "too ')' "
 
-        alphabet = ['0', '1', 'I1', 'I2','I3','I0']
         priority = {'+':1, '&':1, '!':2, '(':0}
         postfix = []
         stack = []
 
         for ch in equa:
-            if ch in alphabet :
+            if self.isOperand(ch) :
                 postfix.append(ch)
             elif ch in '&!+':
                 if len(stack) != 0 and priority[ch] <= priority[stack[-1]]:
@@ -112,6 +116,7 @@ class boolExpStr():
         for n in self.convertPost():
             word2 += n + ' '
         print('Postfix = ',word2)
+        print('Variable are = ', self.findVariable())
         #==================================
         print('------------------------------------------------------------')
         return None
@@ -326,7 +331,8 @@ def drawExpression():
 # equation
 listOfEquation = ["(I0&I1 + !(I1&I2))", "!(1+0)",
                  "!(!(0+I0&1))", "(I0+!I1+!(I2))&(!I0+I1+I2)",
-                  "!(I0&I1)+!(I1+I2)", "(((I0&I1&!I2)+!I1)+I3)"]
+                  "!(I0&I1)+!(I1+I2)", "(((I0&I1&!I2)+!I1)+I3)",
+                  "!A+B+C&D"]
 # N มี 1-6
 # N = 1  >>>  "(I0&I1 + !(I1&I2))"
 # N = 2  >>>  "!(1+0)"
@@ -334,14 +340,15 @@ listOfEquation = ["(I0&I1 + !(I1&I2))", "!(1+0)",
 # N = 4  >>>  "(I0+!I1+!(I2))&(!I0+I1+I2)"
 # N = 5  >>>  "!(I0&I1)+!(I1+I2)"
 # N = 6  >>>  "(((I0&I1&!I2)+!I1)+I3)"
-
-N = 6
+# N = 7  >>>  "!A+B+C%D"
+ 
+N = 7
 eq = boolExpStr(listOfEquation[N-1])
 #--------------------------------------------------------------------
 # main Variable
 anyeq = eq.convertPost() # Convert infix to postfix
 variable  = eq.findVariable() # variabel in equation
-node = expressionTree(anyeq) # Create Node from equation
+node = expressionTree(eq.convertPost()) # Create Node from equation
 
 running = True
 fps = 60
