@@ -13,6 +13,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.show()
 
         self.approve_decimal = True
+        self.reset = False
 
         self.b_0.clicked.connect(self.digit_press)
         self.b_1.clicked.connect(self.digit_press)
@@ -48,18 +49,22 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
     def digit_press(self):
         button = self.sender()
         text = self.l_display.text()
+        if self.reset == True: # เริ่มต้นใหม่
+            text = ''
+            self.reset = False
         if text == '0':
             text = ''
         if ('.' in text and button.text() == '0') or ('('or'+'or'-'or'x'or'÷' in text):
             new_text = format(text + button.text(),'.15')
             
         if len(text) > 0:
-            if text[-1] == ')' or text[-1] == '%':
+            if text[-1] == ')' or text[-1] == '%': # ถ้าตัวก่อนหน้าเป็น ) หรือ % จะไม่ให้เติมตัวเลข
                 new_text = format(text,'.15')
         self.l_display.setText(new_text)
 
     def decimal_press(self):
 
+        self.reset = False
         text = self.l_display.text()
         if len(text) > 0:
             if text[-1] != '%' and self.approve_decimal == True: # ถ้ามีการอนุญาตให้เติมจุด / ยังไม่มีจุด
@@ -75,6 +80,8 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.l_display.setText(new_text)
 
     def deleteAndClear_press(self):
+
+        self.reset = False
         text = self.l_display.text()
         button = self.sender()
 
@@ -89,6 +96,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
             self.approve_decimal = True
     
     def bracket_press(self):
+
         text = self.l_display.text()
         button = self.sender()
         
@@ -117,6 +125,8 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.l_display.setText(new_text)
 
     def operator_press(self):
+
+        self.reset = False
         text = self.l_display.text()
         button = self.sender()
         if len(text) > 0:
@@ -139,6 +149,8 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.l_display.setText(new_text)
 
     def percent_press(self):
+
+        self.reset = False
         text = self.l_display.text()
         if len(text) > 0:
             if self.isNumber(text[-1]):
@@ -150,6 +162,8 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.l_display.setText(new_text)
 
     def equal_press(self):
+
+        
         text = self.l_display.text()
 
         new_text = text.replace('x', '*')
@@ -160,6 +174,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         result = text_postfix.calculatePostfix()
         # print(text_postfix.convertPostfix())
         # print(result)
+        self.reset = True
         self.l_display.setText(result)
 
 if __name__ == "__main__":
@@ -168,3 +183,4 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = CalculatorWin()
     sys.exit(app.exec_())
+    
