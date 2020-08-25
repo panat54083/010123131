@@ -1,3 +1,5 @@
+# 6201012610052 Assingment สำหรับ Calculator โดยใช้ PyQT5
+
 from PyQt5 import QtWidgets
 
 from Main import Ui_MainWindow
