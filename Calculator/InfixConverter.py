@@ -21,13 +21,13 @@ class Infix:
 
     def calculateOperator(self, x, y, operator):
         if operator == '+':
-            return int(x) + int(y)
+            return float(x) + float(y)
         elif operator == '-':
-            return int(x) - int(y)
+            return float(x) - float(y)
         elif operator == '*':
-            return int(x) * int(y)
+            return float(x) * float(y)
         elif operator == '/':
-            return int(x) / int(y)            
+            return float(x) / float(y)            
 
     def convertPostfix(self):
         priority = {'+':1,'-':1,'*':2,'/':2,'(':0}
