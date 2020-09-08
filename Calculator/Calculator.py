@@ -5,6 +5,8 @@ from PyQt5 import QtWidgets
 from Main import Ui_MainWindow
 from InfixConverter import Infix
 
+# รับมือแก้ปัญหาในกรณี - วงเล็บเกิด/ขาด - ปัญหา ไม่สามารถคำนวณเครื่องหมายติดลบ
+
 class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def __init__(self):
@@ -45,35 +47,44 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
     def isNumber(self, c):
         if c in '0123456789':
             return True
+    def isSymbols(self, c):
+        if c in '+-x÷()%':
+            return True
 
-    def digit_press(self):
+    def digit_press(self): # ตัวเลข
         button = self.sender()
         text = self.l_display.text()
+        
         if self.reset == True: # เริ่มต้นใหม่
             text = ''
             self.reset = False
         if text == '0':
             text = ''
-        if ('.' in text and button.text() == '0') or ('('or'+'or'-'or'x'or'÷' in text):
-            new_text = format(text + button.text(),'.15')
-            
         if len(text) > 0:
             if text[-1] == ')' or text[-1] == '%': # ถ้าตัวก่อนหน้าเป็น ) หรือ % จะไม่ให้เติมตัวเลข
-                new_text = format(text,'.15')
+                new_text = format(text,'.19')
+            else:
+                new_text = format(text + button.text(),'.19')
+        else:
+            new_text = format(text + button.text(),'.19')
+
         self.l_display.setText(new_text)
 
     def decimal_press(self):
 
-        self.reset = False
         text = self.l_display.text()
+        if self.reset == True :
+            text = ''
+            self.reset = False
+
         if len(text) > 0:
-            if text[-1] != '%' and self.approve_decimal == True: # ถ้ามีการอนุญาตให้เติมจุด / ยังไม่มีจุด
+            if not self.isSymbols(text[-1]) and self.approve_decimal == True: # ถ้ามีการอนุญาตให้เติมจุด / ยังไม่มีจุด
                 new_text = text + '.'
                 self.approve_decimal = False
 
             else: # There is decimal more than one
                 new_text = text
-        else:
+        else: #Text = '0'
             new_text = '0'+'.'
             self.approve_decimal = False
 
@@ -105,7 +116,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
                 text = ''
 
             if len(text) > 0 :
-                if self.isNumber(text[-1]) or text[-1] in '.': # ถ้าตัวก่อนหน้า ( เป็นตัวเลข และเป็นเครื่องหมาย .
+                if self.isNumber(text[-1]) or text[-1] in '.%': # ถ้าตัวก่อนหน้า ( เป็นตัวเลข และเป็นเครื่องหมาย .%
                     new_text = text
                 else:
                     new_text = text + '('
@@ -114,21 +125,22 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
 
         else: #button.text() == ')'
             if '(' in text: #ถ้ามี ( อยู่ใน label
-                new_text = text + ')'
+                if text[-1] in '(-+x÷' :
+                    new_text = text
+                else:
+                    new_text = text + ')'
             else:
                 new_text = text
 
-            if len(text) > 0 :
-                if text[-1] == '(':
-                    new_text = text
-        
         self.l_display.setText(new_text)
 
     def operator_press(self):
-
+        
+        self.approve_decimal = True
         self.reset = False
         text = self.l_display.text()
         button = self.sender()
+
         if len(text) > 0:
             if text[-1] not in '(+-x÷': # ถ้าข้างหน้า operator ที่จะเติมเป็น oper อีกตัวจะเติมไม่ได้
                 if button.text() == '+':
@@ -139,10 +151,13 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
 
                 elif button.text() == '÷':
                     new_text = text + '÷'
+            
+                elif button.text() == '-':
+                    new_text = text + '-'
+            elif text[-1] == '(' and button.text() == '-': # ยังไม่สามารถคำนวณค่าที่ใส่ ' - ' ไว้ด้านหน้า
+                    new_text = text + '-'
             else:
                 new_text = text
-            if button.text() == '-':
-                new_text = text + '-'
         else:
             new_text = text
 
@@ -163,15 +178,18 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def equal_press(self):
 
-        
         text = self.l_display.text()
 
         new_text = text.replace('x', '*')
         new_text = new_text.replace('÷', '/')
-        new_text = new_text.replace('%', '*1/100')
-
-        text_postfix = Infix(new_text)
-        result = text_postfix.calculatePostfix()
+        new_text = new_text.replace('%', '*0.01')
+        try:
+            text_postfix = Infix(new_text)
+            result = text_postfix.calculatePostfix()
+            while result[-1] == '0':
+                result = result[:-1]
+        except:
+            result = 'Syntex Error'
         # print(text_postfix.convertPostfix())
         # print(result)
         self.reset = True
@@ -183,4 +201,3 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = CalculatorWin()
     sys.exit(app.exec_())
-    
