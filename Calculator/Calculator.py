@@ -5,8 +5,6 @@ from PyQt5 import QtWidgets
 from Main import Ui_MainWindow
 from InfixConverter import Infix
 
-# รับมือแก้ปัญหาในกรณี - วงเล็บเกิด/ขาด - ปัญหา ไม่สามารถคำนวณเครื่องหมายติดลบ
-
 class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def __init__(self):
@@ -55,10 +53,10 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         button = self.sender()
         text = self.l_display.text()
         
-        if self.reset == True: # เริ่มต้นใหม่
+        if self.reset == True or text == 'Syntex Error': # เริ่มต้นใหม่
             text = ''
             self.reset = False
-        if text == '0':
+        if text == '0' or text == 'Syntex Error':
             text = ''
         if len(text) > 0:
             if text[-1] == ')' or text[-1] == '%': # ถ้าตัวก่อนหน้าเป็น ) หรือ % จะไม่ให้เติมตัวเลข
@@ -73,7 +71,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
     def decimal_press(self):
 
         text = self.l_display.text()
-        if self.reset == True :
+        if self.reset == True or text == 'Syntex Error' :
             text = ''
             self.reset = False
 
@@ -112,7 +110,7 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         button = self.sender()
         
         if button.text() == '(':
-            if text == '0': #ถ้าข้อความใน label เป็น 0
+            if text == '0' or text == 'Syntex Error': #ถ้าข้อความใน label เป็น 0
                 text = ''
 
             if len(text) > 0 :
@@ -140,6 +138,8 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reset = False
         text = self.l_display.text()
         button = self.sender()
+        if text == 'Syntex Error':
+            text = ''
 
         if len(text) > 0:
             if text[-1] not in '(+-x÷': # ถ้าข้างหน้า operator ที่จะเติมเป็น oper อีกตัวจะเติมไม่ได้
@@ -159,7 +159,10 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 new_text = text
         else:
-            new_text = text
+            if button.text() == '-':
+                new_text = text + '-'
+            else:
+                new_text = text
 
         self.l_display.setText(new_text)
 
@@ -183,9 +186,11 @@ class CalculatorWin(QtWidgets.QMainWindow, Ui_MainWindow):
         new_text = text.replace('x', '*')
         new_text = new_text.replace('÷', '/')
         new_text = new_text.replace('%', '*0.01')
+        
         try:
             text_postfix = Infix(new_text)
             result = text_postfix.calculatePostfix()
+            result = "%.2f" % float(result)
             while result[-1] == '0':
                 result = result[:-1]
         except:
