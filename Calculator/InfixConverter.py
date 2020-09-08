@@ -1,10 +1,19 @@
 class Infix:
     def __init__(self, equation):
         self.equa = equation.replace(' ','')
-    
+        self.problam  = False
+
     def list_equation(self):
         SYMBOLS = set('+-*/()')
         equation = self.equa
+        for i in range(len(equation)):
+            
+            if equation[i] == '-':
+                if i == 0:
+                    equation = '0' + equation[i:]
+                elif equation[i-1] not in '0123456789':
+                    print(i)
+                    equation = equation[:i] + '0' + equation[i:]
         mark = 0
         result = []
         for i in range(len(equation)):
@@ -18,6 +27,24 @@ class Infix:
             result.append(equation[mark:len(equation)])
 
         return result
+
+    
+
+    def check_problam(self):
+        equation = self.list_equation()
+        count = 0
+        for ch in equation:
+            if ch == '(':
+                count += 1
+            elif ch == ')':
+                count -= 1
+        if count != 0 :
+            if count > 0 :
+                self.problam = True
+            else:
+                self.problam = True
+        else:
+            self.problam = False
 
     def calculateOperator(self, x, y, operator):
         if operator == '+':
@@ -34,7 +61,9 @@ class Infix:
         postfix = []
         stack = []
 
+
         equation = self.list_equation()
+
         for ch in equation:
             if ch not in '+-*/()':
                 postfix.append(ch)
@@ -69,11 +98,17 @@ class Infix:
         
         for i in stack:
             str_result = str_result + str(i)
+
+        # str_result = "%.2f" % round(float(str_result), 5)
         
         return str_result
+    
 
 
 if __name__ == "__main__":
     text1 = Infix('1+1+1+1+1+1')
+    text2 = Infix('-2+2')
     print(text1.convertPostfix())
+    print(text2.convertPostfix())
     print(text1.calculatePostfix())
+    print(text2.calculatePostfix())
