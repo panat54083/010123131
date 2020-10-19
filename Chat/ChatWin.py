@@ -26,17 +26,16 @@ class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
 
         self.Send.clicked.connect(self.send_message)
     def send_message(self):
-        print("EIEI")
-        # try:
-        #     message = self.TypeHere.textStatus.text()
-        #     print(message)
-        #     message = message.encode('utf-8')
-        #     message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-        #     client_socket.send(message_header + message)
-        #     self.TypeHere.clear()
+        try:
+            message = self.TypeHere.toPlainText()
+            message = message.encode('utf-8')
+            message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
+            client_socket.send(message_header + message)
 
-        # except:
-        #     print("Send Error")
+            self.TypeHere.clear()
+
+        except:
+            print("Send Error")
 
 class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
 
@@ -67,17 +66,6 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
         except:
             print("Error name")
     
-    def send_message(self):
-        try:
-            message = self.TypeHere.textStatus.text()
-            print(message)
-            message = message.encode('utf-8')
-            message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-            client_socket.send(message_header + message)
-            self.TypeHere.clear()
-
-        except:
-            pass
 
 class ClientThread(Thread):
     def __init__(self,MainChat): 
