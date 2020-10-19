@@ -26,16 +26,23 @@ class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
 
         self.Send.clicked.connect(self.send_message)
     def send_message(self):
-        try:
-            message = self.TypeHere.toPlainText()
-            message = message.encode('utf-8')
-            message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-            client_socket.send(message_header + message)
+        message = self.TypeHere.toPlainText()
+        message = message.encode('utf-8')
+        message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
+        client_socket.send(message_header + message)
 
-            self.TypeHere.clear()
+        self.TypeHere.clear()
+        
+        # try:
+        #     message = self.TypeHere.toPlainText()
+        #     message = message.encode('utf-8')
+        #     message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
+        #     client_socket.send(message_header + message)
 
-        except:
-            print("Send Error")
+        #     self.TypeHere.clear()
+        #     self.textBrowser_2.textStatus.setText("EIEI")
+        # except:
+        #     print("Send Error")
 
 class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
 
@@ -59,8 +66,10 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
             username = my_username.encode('utf-8')
             username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
             client_socket.send(username_header + username)
+            
             self.hide()
             self.MainChat = MainChat()
+            self.MainChat.Usernamedisplay.setText(my_username)
             # self.displayText.appendPlainText(text)
 
         except:
@@ -94,8 +103,8 @@ class ClientThread(Thread):
                 message_header = client_socket.recv(HEADER_LENGTH)
                 message_length = int(message_header.decode('utf-8').strip())
                 message = client_socket.recv(message_length).decode('utf-8')
-
-                MainChat.textBrowser_2.textStatus.setText(f'{username} > {message}')
+                
+                MainChat.textBrowser_3.textStatus.append(f'{username} > {message}')
 
             client_socket.close()
         except IOError as e:
