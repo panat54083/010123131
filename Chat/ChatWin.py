@@ -44,6 +44,7 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
         super().__init__()
         self.setupUi(self)
         self.show()
+        
 
         
         self.connectButton.clicked.connect(self.send_name)
@@ -60,6 +61,7 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
             username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
             client_socket.send(username_header + username)
             self.hide()
+            self.MainChat = MainChat()
             # self.displayText.appendPlainText(text)
 
         except:
