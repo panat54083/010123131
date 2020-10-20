@@ -26,23 +26,17 @@ class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
 
         self.Send.clicked.connect(self.send_message)
     def send_message(self):
+        
+        # show message on display
+        username = self.Usernamedisplay.toPlainText()
         message = self.TypeHere.toPlainText()
+        self.showText.append(username + ": "+ message)
+        # send message to socket
         message = message.encode('utf-8')
         message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
         client_socket.send(message_header + message)
-
-        self.TypeHere.clear()
         
-        # try:
-        #     message = self.TypeHere.toPlainText()
-        #     message = message.encode('utf-8')
-        #     message_header = f"{len(message):<{HEADER_LENGTH}}".encode('utf-8')
-        #     client_socket.send(message_header + message)
-
-        #     self.TypeHere.clear()
-        #     self.textBrowser_2.textStatus.setText("EIEI")
-        # except:
-        #     print("Send Error")
+        self.TypeHere.clear()
 
 class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
 
@@ -50,8 +44,6 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
         super().__init__()
         self.setupUi(self)
         self.show()
-        
-
         
         self.connectButton.clicked.connect(self.send_name)
         # self.Send.clicked.connect(self.send_message)
@@ -77,10 +69,10 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
     
 
 class ClientThread(Thread):
-    def __init__(self,MainChat): 
+    def __init__(self,Chatwin): 
         Thread.__init__(self) 
-        self.MainChat = MainChat
-
+        self.chat = ChatWin
+        self.main = MainChat
     def run(self): 
         IP = "127.0.0.1"
         PORT = 1234
@@ -88,39 +80,26 @@ class ClientThread(Thread):
         global client_socket
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((IP, PORT))
-        client_socket.setblocking(False)
-        
-        try:
-            while True:
-                username_header = client_socket.recv(HEADER_LENGTH)
-                if not len(username_header):
-                    print('Connection closed by the server')
-                    sys.exit()
-                username_length = int(username_header.decode('utf-8').strip())
+        client_socket.setblocking(1)
 
-                # Receive and decode username
-                username = client_socket.recv(username_length).decode('utf-8')
-                message_header = client_socket.recv(HEADER_LENGTH)
-                message_length = int(message_header.decode('utf-8').strip())
-                message = client_socket.recv(message_length).decode('utf-8')
-                
-                MainChat.textBrowser_3.textStatus.append(f'{username} > {message}')
-
-            client_socket.close()
-        except IOError as e:
-            # This is normal on non blocking connections - when there are no incoming data error is going to be raised
-            # Some operating systems will indicate that using AGAIN, and some using WOULDBLOCK error code
-            # We are going to check for both - if one of them - that's expected, means no incoming data, continue as normal
-            # If we got different error code - something happened
-            if e.errno != errno.EAGAIN and e.errno != errno.EWOULDBLOCK:
-                print('Reading error: {}'.format(str(e)))
+        while True:
+            username_header = client_socket.recv(HEADER_LENGTH)
+            if not len(username_header):
+                print('Connection closed by the server')
                 sys.exit()
-
-        except Exception as e:
-            # Any other exception - something happened, exit
-            print('Reading error: '.format(str(e)))
-            sys.exit()
-
+            username_length = int(username_header.decode('utf-8').strip())
+            
+            # Receive and decode username
+            username = client_socket.recv(username_length).decode('utf-8')
+            message_header = client_socket.recv(HEADER_LENGTH)
+            message_length = int(message_header.decode('utf-8').strip())
+            message = client_socket.recv(message_length).decode('utf-8')
+            # self.main.showText.append(f'{username} > {message}')
+            # self.main.showText.append("EIEI")
+            print(f'{username} > {message}')
+            
+                
+        client_socket.close()
 
 
 if __name__ == "__main__":
@@ -131,5 +110,5 @@ if __name__ == "__main__":
     ui = ChatWin()
     clientThread=ClientThread(ui)
     clientThread.start()
-    # ui.exec()
+
     sys.exit(app.exec_())
