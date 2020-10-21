@@ -95,7 +95,7 @@ class ClientThread(Thread):
             message_header = client_socket.recv(HEADER_LENGTH)
             message_length = int(message_header.decode('utf-8').strip())
             message = client_socket.recv(message_length).decode('utf-8')
-
+            # This is a problem
             print(f'{username} > {message}')
             # self.main.showText.append(f'{username} > {message}')
 
