@@ -46,7 +46,7 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
         self.show()
         
         self.connectButton.clicked.connect(self.send_name)
-        # self.Send.clicked.connect(self.send_message)
+
 
     
     def send_name(self):
@@ -69,6 +69,7 @@ class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
     
 
 class ClientThread(Thread):
+    
     def __init__(self,Chatwin): 
         Thread.__init__(self) 
         self.chat = ChatWin
@@ -81,7 +82,7 @@ class ClientThread(Thread):
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((IP, PORT))
         client_socket.setblocking(1)
-
+        
         while True:
             username_header = client_socket.recv(HEADER_LENGTH)
             if not len(username_header):
@@ -94,11 +95,12 @@ class ClientThread(Thread):
             message_header = client_socket.recv(HEADER_LENGTH)
             message_length = int(message_header.decode('utf-8').strip())
             message = client_socket.recv(message_length).decode('utf-8')
-            # self.main.showText.append(f'{username} > {message}')
-            # self.main.showText.append("EIEI")
+
             print(f'{username} > {message}')
-            
-                
+            # self.main.showText.append(f'{username} > {message}')
+
+
+       
         client_socket.close()
 
 
