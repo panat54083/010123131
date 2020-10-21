@@ -38,6 +38,7 @@ class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
         
         self.TypeHere.clear()
 
+
 class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
 
     def __init__(self):
@@ -73,7 +74,8 @@ class ClientThread(Thread):
     def __init__(self,Chatwin): 
         Thread.__init__(self) 
         self.chat = ChatWin
-        self.main = MainChat
+        self.main = MainChat()
+        self.main.hide()
     def run(self): 
         IP = "127.0.0.1"
         PORT = 1234
@@ -95,9 +97,10 @@ class ClientThread(Thread):
             message_header = client_socket.recv(HEADER_LENGTH)
             message_length = int(message_header.decode('utf-8').strip())
             message = client_socket.recv(message_length).decode('utf-8')
-            # This is a problem
-            print(f'{username} > {message}')
-            # self.main.showText.append(f'{username} > {message}')
+
+            text = f'{username} : {message}'
+            print(text)
+            # self.main.showText.append(text)
 
 
        
@@ -112,5 +115,6 @@ if __name__ == "__main__":
     ui = ChatWin()
     clientThread=ClientThread(ui)
     clientThread.start()
+    
 
     sys.exit(app.exec_())
