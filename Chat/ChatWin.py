@@ -74,8 +74,8 @@ class ClientThread(Thread):
     def __init__(self,Chatwin): 
         Thread.__init__(self) 
         self.chat = ChatWin
-        self.main = MainChat()
-        self.main.hide()
+        self.main = MainChat
+        # self.main.hide()
     def run(self): 
         IP = "127.0.0.1"
         PORT = 1234
