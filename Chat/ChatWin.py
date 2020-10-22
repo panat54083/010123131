@@ -17,6 +17,33 @@ client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((IP, PORT))
 client_socket.setblocking(False)
 
+class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
+
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.show()
+        self.connectButton.clicked.connect(self.send_name)
+
+    def send_name(self):
+        
+        try:
+            # get name
+            my_username = self.InputUser.text()
+
+            # encode name tp bythes
+            username = my_username.encode('utf-8')
+            username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
+            client_socket.send(username_header + username)
+            # opne secound part
+            self.hide()
+            ui2.show()
+            #  set name at scound part
+            ui2.Usernamedisplay.setText(my_username)
+
+        except:
+            print("Error at sendding name part")
+
 class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
 
     def __init__(self):
@@ -38,36 +65,6 @@ class MainChat(QtWidgets.QMainWindow, Ui_MainWindow2):
         
         self.TypeHere.clear()
 
-
-class ChatWin(QtWidgets.QMainWindow, Ui_MainWindow1):
-
-    def __init__(self):
-        super().__init__()
-        self.setupUi(self)
-        self.show()
-        
-        self.connectButton.clicked.connect(self.send_name)
-
-
-    
-    def send_name(self):
-        try:
-            # get name
-            my_username = self.InputUser.text()
-
-            # encode name tp bythes
-            username = my_username.encode('utf-8')
-            username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
-            client_socket.send(username_header + username)
-            
-            self.hide()
-            self.MainChat = MainChat()
-            self.MainChat.Usernamedisplay.setText(my_username)
-            # self.displayText.appendPlainText(text)
-
-        except:
-            print("Error name")
-    
 
 class ClientThread(Thread):
     
@@ -98,12 +95,11 @@ class ClientThread(Thread):
             message_length = int(message_header.decode('utf-8').strip())
             message = client_socket.recv(message_length).decode('utf-8')
 
+            # send message
             text = f'{username} : {message}'
             print(text)
-            # self.main.showText.append(text)
+            ui2.showText.append(text)
 
-
-       
         client_socket.close()
 
 
@@ -112,9 +108,11 @@ if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
     SW_Chat = QtWidgets.QMainWindow()
 
+    ui2 = MainChat()
+    ui2.close()
     ui = ChatWin()
-    clientThread=ClientThread(ui)
+
+    clientThread = ClientThread(ui2)
     clientThread.start()
     
-
     sys.exit(app.exec_())
