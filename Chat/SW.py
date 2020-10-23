@@ -50,7 +50,6 @@ class Ui_MainWindow1(object):
         self.connectButton = QtWidgets.QPushButton(self.centralwidget)
         self.connectButton.setGeometry(QtCore.QRect(360, 410, 93, 28))
         self.connectButton.setObjectName("ConnectButton")
-        self.connectButton.clicked.connect(self.connect)
         self.Background.raise_()
         self.Icon.raise_()
         self.EnterUsername.raise_()
