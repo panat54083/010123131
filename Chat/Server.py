@@ -105,11 +105,9 @@ while True:
 
             # If False, client disconnected, cleanup
             if message is False:
-                try:
 
-                    client_socket.send(0)
-                except:
-                    pass
+                # client_socket.send("".encode("utf-8"))
+
                 print('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
 
                 # Remove from list for socket.socket()
@@ -134,7 +132,6 @@ while True:
                     # Send user and message (both with their headers)
                     # We are reusing here message header sent by sender, and saved username header send by user when he connected
                     client_socket.send(user['header'] + user['data'] + message['header'] + message['data'])
-
     # It's not really necessary to have this, but will handle some socket exceptions just in case
     for notified_socket in exception_sockets:
 
