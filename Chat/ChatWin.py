@@ -108,9 +108,7 @@ class ClientThread(Thread):
         while True:
             
             username_header = client_socket.recv(HEADER_LENGTH)
-            # Bool_user = bool(int(username_header.encode('hex'), 16))
-            # print(Bool_user)
-            # if Bool_user == False: # ตรวจสอบคนออก
+            # if not len(username_header): # ตรวจสอบคนออก
             #     text_out = '---- Closed connection from: {} ----'.format(username_old)
             #     print(text_out)
             #     ui2.showText.append(text_out)
