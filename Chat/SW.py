@@ -80,4 +80,3 @@ if __name__ == "__main__":
     ui.setupUi(SW_Chat)
     SW_Chat.show()
     sys.exit(app.exec_())
-
