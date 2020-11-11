@@ -34,7 +34,7 @@ class Ui_MainWindow2(object):
         self.Send.setGeometry(QtCore.QRect(640, 430, 93, 28))
         self.Send.setObjectName("Send")
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
-        self.textBrowser.setGeometry(QtCore.QRect(80, 20, 201, 51))
+        self.textBrowser.setGeometry(QtCore.QRect(70, 20, 211, 51))
         font = QtGui.QFont()
         font.setPointSize(18)
         font.setBold(True)
@@ -56,7 +56,7 @@ class Ui_MainWindow2(object):
         self.user_online.setFont(font)
         self.user_online.setObjectName("user_online")
         self.showText = QtWidgets.QTextBrowser(self.centralwidget)
-        self.showText.setGeometry(QtCore.QRect(310, 20, 421, 291))
+        self.showText.setGeometry(QtCore.QRect(70, 80, 661, 231))
         font = QtGui.QFont()
         font.setPointSize(14)
         self.showText.setFont(font)
@@ -78,7 +78,7 @@ class Ui_MainWindow2(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:18pt; font-weight:600; font-style:normal;\">\n"
-"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Online User</span></p></body></html>"))
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Online</span></p></body></html>"))
         self.Usernamedisplay.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
