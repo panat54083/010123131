@@ -105,6 +105,11 @@ while True:
 
             # If False, client disconnected, cleanup
             if message is False:
+                try:
+
+                    client_socket.send(0)
+                except:
+                    pass
                 print('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
 
                 # Remove from list for socket.socket()
